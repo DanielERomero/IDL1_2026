@@ -23,6 +23,30 @@ if archivo is not None:
         # KPIs generales
         total_ventas = df['venta_total'].sum()
         promedio_ventas = df['venta_total'].mean()
+
+        # KPIs visuales con colores
+        st.markdown("""
+        <style>
+        .metric {
+            background-color: #f0f0f5;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            font-size: 20px;
+            color: black;
+        }
+        .kpi-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        
+        st.markdown('<div class="kpi-container">', unsafe_allow_html=True)
+        st.markdown(f'<div class="metric" style="background-color: #007bff;">Total Ventas: ${total_ventas:,.2f}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="metric" style="background-color: #28a745;">Ventas Promedio: ${ventas_promedio:,.2f}</div>', unsafe_allow_html=True)
+
         
         st.metric(label='Total de ventas', value=f'{total_ventas:,.2f}')
         st.metric(label='Promedio de ventas por transacción', value=f'{promedio_ventas:,.2f}')
