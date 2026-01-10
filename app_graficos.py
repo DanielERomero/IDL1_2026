@@ -4,6 +4,9 @@ import plotly.express as px
 import plotly.graph_objects as go
 import seaborn as sns
 import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.linear_model import LinearRegression
+
 
 st.title('Visor de ventas - Tienda de conveniencia')
 
@@ -68,8 +71,26 @@ if archivo is not None:
         st.plotly_chart(fig1)
 
         # Gráfico de lineas
-        st.subheader('Ventas a lo largo del tiempo')
-        fig_line = px.line(df, x='fecha', y='venta_total', title='Ventas por Fecha')
+        # Asegúrate de que la columna 'fecha' esté en formato datetime
+        df['fecha'] = pd.to_datetime(df['fecha'])
+    
+        # Agrupar las ventas por fecha (mensual o semanal, dependiendo de tus necesidades)
+        df_resample = df.resample('M', on='fecha').sum().reset_index()  # Agrupar por mes
+        
+        # Convertir las fechas a valores numéricos para la regresión
+        df_resample['fecha_num'] = df_resample['fecha'].map(pd.Timestamp.timestamp)
+        
+        # Ajustar el modelo de regresión lineal
+        model = LinearRegression()
+        model.fit(df_resample['fecha_num'].values.reshape(-1, 1), df_resample['venta_total'].values)
+        
+        # Predecir la tendencia
+        df_resample['tendencia'] = model.predict(df_resample['fecha_num'].values.reshape(-1, 1))
+        
+        # Crear el gráfico de línea con la tendencia
+        fig_line = px.line(df_resample, x='fecha', y='venta_total', title='Ventas con Línea de Tendencia')
+        fig_line.add_scatter(x=df_resample['fecha'], y=df_resample['tendencia'], mode='lines', name='Tendencia', line=dict(color='red', dash='dash'))
+        
         st.plotly_chart(fig_line)
 
         # Gráfico interactivo de ventas por turno
