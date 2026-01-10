@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import seaborn as sns
 
 st.title('Visor de ventas - Tienda de conveniencia')
 
@@ -121,6 +122,14 @@ if archivo is not None:
 
             else:
                 st.error("Seleccione dos variables diferentes")
+        # Gráfico de correlación
+        st.subheader("Matriz de Correlación")
+        corr_matrix = df[vars_numericas].corr()
+
+        # Usar Seaborn para el heatmap de correlación
+        fig, ax = plt.subplots(figsize=(10, 8))
+        sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', ax=ax, fmt=".2f", cbar_kws={'label': 'Correlación'})
+        st.pyplot(fig)
 else:
     # Mensaje informativo inicial si no hay archivo
     st.info("Por favor sube un archivo CSV para visualizar los datos. Se requieren las columnas: " + str(columnas_necesarias))
