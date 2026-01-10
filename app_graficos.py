@@ -96,7 +96,7 @@ if archivo is not None:
         # Gráfico interactivo de ventas por turno
         st.subheader('Ventas total por turno (Interactividad)')
         ventas_turno = df.groupby('turno')['venta_total'].sum().reset_index()
-        fig2 = px.bar(ventas_turno, x='turno', y='venta_total', title='Ventas por Turno', color='turno', color_continuous_scale='Blues')
+        fig2 = px.pie(ventas_turno, x='turno', y='venta_total', title='Ventas por Turno', color='turno', color_continuous_scale='Blues')
         st.plotly_chart(fig2)
 
         # Gráfico interactivo de ventas por tienda
