@@ -1,9 +1,9 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
 import plotly.express as px
+import plotly.graph_objects as go
 
-st.title('Visor de ventas -Tienda de conveniencia')
+st.title('Visor de ventas - Tienda de conveniencia')
 
 # Definir columnas necesarias globalmente para evitar errores
 columnas_necesarias = {'producto', 'turno', 'tienda', 'venta_total'}
@@ -16,13 +16,13 @@ if archivo is not None:
     st.subheader('Vista previa del archivo')
     st.dataframe(df)
     
-    # Validacion
+    # Validación
     if not columnas_necesarias.issubset(df.columns):
         st.error('El archivo debe contener las columnas: ' + str(columnas_necesarias))
     else:
         # KPIs generales
         total_ventas = df['venta_total'].sum()
-        promedio_ventas = df['venta_total'].mean()
+        ventas_promedio = df['venta_total'].mean()
 
         # KPIs visuales con colores
         st.markdown("""
@@ -47,27 +47,40 @@ if archivo is not None:
         st.markdown(f'<div class="metric" style="background-color: #007bff;">Total Ventas: ${total_ventas:,.2f}</div>', unsafe_allow_html=True)
         st.markdown(f'<div class="metric" style="background-color: #28a745;">Ventas Promedio: ${ventas_promedio:,.2f}</div>', unsafe_allow_html=True)
 
+        # Producto con mayores ventas
+        producto_top = df.groupby('producto')['venta_total'].sum().idxmax()
+        ventas_producto_top = df.groupby('producto')['venta_total'].sum().max()
+        st.markdown(f'<div class="metric" style="background-color: #ffc107;">Producto más vendido: {producto_top} (${ventas_producto_top:,.2f})</div>', unsafe_allow_html=True)
+
+        # Turno con mayores ventas
+        turno_top = df.groupby('turno')['venta_total'].sum().idxmax()
+        ventas_turno_top = df.groupby('turno')['venta_total'].sum().max()
+        st.markdown(f'<div class="metric" style="background-color: #17a2b8;">Turno más rentable: {turno_top} (${ventas_turno_top:,.2f})</div>', unsafe_allow_html=True)
+
+        st.markdown('</div>', unsafe_allow_html=True)
         
-    
-        
-        # Ventas de productos
+        # Gráfico interactivo de ventas por producto
         st.subheader('Ventas total por producto (Interactividad)')
         ventas_producto = df.groupby('producto')['venta_total'].sum().reset_index()
-        fig1 = px.bar(ventas_producto, x='producto', y='venta_total', title='Ventas por Producto')
+        fig1 = px.bar(ventas_producto, x='producto', y='venta_total', title='Ventas por Producto', color='producto', color_continuous_scale='Viridis')
         st.plotly_chart(fig1)
-    
-         # Gráfico interactivo de ventas por turno
+
+        # Gráfico interactivo de ventas por turno
         st.subheader('Ventas total por turno (Interactividad)')
         ventas_turno = df.groupby('turno')['venta_total'].sum().reset_index()
-        fig2 = px.bar(ventas_turno, x='turno', y='venta_total', title='Ventas por Turno')
+        fig2 = px.bar(ventas_turno, x='turno', y='venta_total', title='Ventas por Turno', color='turno', color_continuous_scale='Blues')
         st.plotly_chart(fig2)
-        
+
         # Gráfico interactivo de ventas por tienda
         st.subheader('Ventas total por tienda (Interactividad)')
         ventas_tienda = df.groupby('tienda')['venta_total'].sum().reset_index()
-        fig3 = px.bar(ventas_tienda, x='tienda', y='venta_total', title='Ventas por Tienda')
+        fig3 = px.bar(ventas_tienda, x='tienda', y='venta_total', title='Ventas por Tienda', color='tienda', color_continuous_scale='RdBu')
         st.plotly_chart(fig3)
-       
+
+        # Gráfico de dispersión de ventas por producto vs turno
+        st.subheader('Dispersión de ventas por Producto vs Turno')
+        fig4 = px.scatter(df, x='producto', y='turno', size='venta_total', color='venta_total', title='Dispersión de ventas', color_continuous_scale='Rainbow')
+        st.plotly_chart(fig4)
 
         # --- SECCIÓN CORRELACIÓN ---
         st.title("Correlación de Pearson - ventas")
