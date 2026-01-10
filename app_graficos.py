@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+import plotly.express as px
 
 st.title('Visor de ventas -Tienda de conveniencia')
 
@@ -19,31 +20,31 @@ if archivo is not None:
     if not columnas_necesarias.issubset(df.columns):
         st.error('El archivo debe contener las columnas: ' + str(columnas_necesarias))
     else:
+        # KPIs generales
+        total_ventas = df['venta_total'].sum()
+        promedio_ventas = df['venta_total'].mean()
+        
+        st.metric(label='Total de ventas', value=f'{total_ventas:,.2f}')
+        st.metric(label='Promedio de ventas por transacción', value=f'{promedio_ventas:,.2f}')
+        
         # Ventas de productos
-        st.subheader('Ventas total por tipo de producto')
-        # Agrupación y ploteo
-        ventas_producto = df.groupby('producto')['venta_total'].sum()
+        st.subheader('Ventas total por producto (Interactividad)')
+        ventas_producto = df.groupby('producto')['venta_total'].sum().reset_index()
+        fig1 = px.bar(ventas_producto, x='producto', y='venta_total', title='Ventas por Producto')
+        st.plotly_chart(fig1)
+    
+         # Gráfico interactivo de ventas por turno
+        st.subheader('Ventas total por turno (Interactividad)')
+        ventas_turno = df.groupby('turno')['venta_total'].sum().reset_index()
+        fig2 = px.bar(ventas_turno, x='turno', y='venta_total', title='Ventas por Turno')
+        st.plotly_chart(fig2)
         
-        fig1 = plt.figure()
-        ventas_producto.plot(kind='bar', x='producto', y='venta_total')
-        plt.xticks(rotation=45)
-        st.pyplot(fig1)
-
-        # Ventas por turno
-        st.subheader('Ventas total por turno')
-        ventas_turno = df.groupby('turno')['venta_total'].sum()
-        
-        fig2 = plt.figure()
-        ventas_turno.plot(kind='bar', x='turno', y='venta_total')
-        st.pyplot(fig2)
-
-        # Ventas por tienda
-        st.subheader('Ventas total por tienda')
-        ventas_tienda = df.groupby('tienda')['venta_total'].sum()
-        
-        fig3 = plt.figure()
-        ventas_tienda.plot(kind='bar', x='tienda', y='venta_total')
-        st.pyplot(fig3)
+        # Gráfico interactivo de ventas por tienda
+        st.subheader('Ventas total por tienda (Interactividad)')
+        ventas_tienda = df.groupby('tienda')['venta_total'].sum().reset_index()
+        fig3 = px.bar(ventas_tienda, x='tienda', y='venta_total', title='Ventas por Tienda')
+        st.plotly_chart(fig3)
+       
 
         # --- SECCIÓN CORRELACIÓN ---
         st.title("Correlación de Pearson - ventas")
