@@ -48,8 +48,7 @@ if archivo is not None:
         st.markdown(f'<div class="metric" style="background-color: #28a745;">Ventas Promedio: ${ventas_promedio:,.2f}</div>', unsafe_allow_html=True)
 
         
-        st.metric(label='Total de ventas', value=f'{total_ventas:,.2f}')
-        st.metric(label='Promedio de ventas por transacción', value=f'{promedio_ventas:,.2f}')
+    
         
         # Ventas de productos
         st.subheader('Ventas total por producto (Interactividad)')
