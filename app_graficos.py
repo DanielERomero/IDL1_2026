@@ -67,6 +67,11 @@ if archivo is not None:
         fig1 = px.bar(ventas_producto, x='producto', y='venta_total', title='Ventas por Producto', color='producto', color_continuous_scale='Viridis')
         st.plotly_chart(fig1)
 
+        # Gráfico de lineas
+        st.subheader('Ventas a lo largo del tiempo')
+        fig_line = px.line(df, x='fecha', y='venta_total', title='Ventas por Fecha')
+        st.plotly_chart(fig_line)
+
         # Gráfico interactivo de ventas por turno
         st.subheader('Ventas total por turno (Interactividad)')
         ventas_turno = df.groupby('turno')['venta_total'].sum().reset_index()
