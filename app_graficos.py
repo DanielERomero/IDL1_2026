@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import seaborn as sns
+import matplotlib.pyplot as plt
 
 st.title('Visor de ventas - Tienda de conveniencia')
 
