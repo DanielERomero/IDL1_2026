@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 st.title('Visor de ventas -Tienda de conveniencia')
 
 archivo = st.file_uploader('Sube el archivo CSV', type=['csv'])
-"""
+
 if archivo is not None:
     df = pd.read_csv(archivo)
     st.subheader('Vista previa del archivo')
@@ -45,7 +45,7 @@ else:
 
     
 st.title("Correlación de Pearson - ventas")
-"""
+
 
 if archivo is not None:
     df = pd.read_csv(archivo)
