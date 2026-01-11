@@ -25,10 +25,10 @@ supabase: Client = create_client(url, key)
 # obtener los datos desde Supabase
 def obtener_datos():
     response = supabase.table('IDL1_2026').select('*').execute()
-    if response.status_code == 200:
+    if 'data' in response:
         return response.data
     else:
-        st.error("Error al obtener los datos desde Supabase")
+        st.error(f"Error al obtener los datos: {response.get('error_message', 'Desconocido')}")
         return []
 
 # Obtener los datos desde Supabase
