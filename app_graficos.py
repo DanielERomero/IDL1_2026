@@ -38,7 +38,7 @@ def obtener_datos():
         return []
     try:
         # Ajusta el nombre de la tabla si es necesario
-        response = supabase.table('IDL1_2026').select('*').execute()
+        response = supabase.table('IDL1_2026').select('*').limit(10000).execute()
         return response.data
     except Exception as e:
         st.error(f"Error al obtener los datos: {e}")
@@ -108,7 +108,7 @@ if data:
         df['fecha'] = pd.to_datetime(df['fecha'])
     
         # Agrupar las ventas por fecha 
-        df_resample = df.resample('D', on='fecha').sum().reset_index()  
+        df_resample = df.resample('M', on='fecha').sum().reset_index()  
         
         if len(df_resample) > 1:
             # Convertimos fecha a número (timestamp) para que sklearn la entienda
