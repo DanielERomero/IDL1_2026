@@ -158,35 +158,6 @@ if data:
 
             st.subheader('Distribución de Ventas Mensuales (Box Plot)')
 
-            # 1. Preparar datos:
-            df['fecha'] = pd.to_datetime(df['fecha'])
-            # Creamos columna Mes-Año 
-            df['mes_año'] = df['fecha'].dt.to_period('M').astype(str)
-
-            # 2. Crear el Box Plot
-            fig = px.box(
-                df, 
-                x='mes_año', 
-                y='venta_total',
-                title='Variabilidad de Ventas por Mes',
-                points="outliers", # Solo muestra los puntos extremos (outliers)
-                color='mes_año',   # Colores distintos por mes
-                color_discrete_sequence=px.colors.qualitative.Prism 
-            )
-
-            fig.update_layout(
-                xaxis_title="Mes",
-                yaxis_title="Ventas por Ticket ($)",
-                showlegend=False
-            )
-
-            st.plotly_chart(fig, use_container_width=True)
-
-            # Explicación "Data Science" para tu usuario
-            st.caption(" **Tip de lectura:** La línea dentro de la caja es la mediana. Si la caja sube mes a mes, tu negocio crece sólidamente. Los puntos sueltos son ventas atípicas.")
-            
-        else:
-            st.warning("No hay suficientes datos diarios para calcular una tendencia.")
 
         # Gráfico interactivo de ventas por turno
         st.subheader('Ventas total por turno ')
