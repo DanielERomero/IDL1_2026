@@ -108,7 +108,7 @@ if data:
         df['fecha'] = pd.to_datetime(df['fecha'])
     
         # Agrupar las ventas por fecha 
-        df_resample = df.resample('D', on='fecha').sum().reset_index()  
+        df_resample = df.resample('M', on='fecha').sum().reset_index()  
         
         if len(df_resample) > 1:
             # Convertimos fecha a número (timestamp) para que sklearn la entienda
