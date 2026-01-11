@@ -104,11 +104,11 @@ if data:
         st.plotly_chart(fig1)
 
         # Gráfico de lineas
-        # Asegúrate de que la columna 'fecha' esté en formato datetime
+        st.subheader('Tendencia de Ventas en el Tiempo')
         df['fecha'] = pd.to_datetime(df['fecha'])
     
-        # Agrupar las ventas por fecha (mensual o semanal, dependiendo de tus necesidades)
-        df_resample = df.resample('M', on='fecha').sum().reset_index()  # Agrupar por mes
+        # Agrupar las ventas por fecha 
+        df_resample = df.resample('D', on='fecha').sum().reset_index()  
         
         # Convertir las fechas a valores numéricos para la regresión
         df_resample['fecha_num'] = df_resample['fecha'].map(pd.Timestamp.timestamp)
