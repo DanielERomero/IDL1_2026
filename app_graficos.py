@@ -24,7 +24,7 @@ supabase: Client = create_client(url, key)
 
 # obtener los datos desde Supabase
 def obtener_datos():
-    response = supabase.table('ventas').select('*').execute()
+    response = supabase.table('IDL1_2026').select('*').execute()
     if response.status_code == 200:
         return response.data
     else:
