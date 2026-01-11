@@ -12,7 +12,7 @@ import os
 
 # Configuración de página
 st.set_page_config(page_title="Visor de Ventas", layout="wide")
-st.title('Visor de ventas - Tienda de conveniencia')
+st.title('Visor de ventas (Version2.0) - Tienda de conveniencia')
 
 # Definir columnas necesarias globalmente para evitar errores
 columnas_necesarias = {'producto', 'turno', 'tienda', 'venta_total','fecha'}
@@ -38,7 +38,7 @@ def obtener_datos():
         return []
     try:
         # Ajusta el nombre de la tabla si es necesario
-        response = supabase.table('IDL1_2026').select('*').limit(10000).execute()
+        response = supabase.table('IDL1_2026').select('*').limit(10000).execute().data
         return response.data
     except Exception as e:
         st.error(f"Error al obtener los datos: {e}")
