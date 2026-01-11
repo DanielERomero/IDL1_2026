@@ -104,45 +104,62 @@ if data:
         st.plotly_chart(fig1)
 
         # Gráfico de lineas
-        st.subheader('Tendencia de Ventas en el Tiempo')
+        st.subheader('Tendencia de Ventas Semanal')
+
+        # 1. Asegurar formato fecha
         df['fecha'] = pd.to_datetime(df['fecha'])
-    
-        # Agrupar las ventas por fecha 
-        df_resample = df.resample('D', on='fecha').sum().reset_index()  
-        
-        if len(df_resample) > 1:
-            # Convertimos fecha a número (timestamp) para que sklearn la entienda
-            df_resample['fecha_num'] = df_resample['fecha'].map(pd.Timestamp.timestamp)
+
+        # 2. Agrupar por SEMANA ('W' = Weekly)
+        # Esto suaviza el gráfico: en lugar de 200 puntos ruidosos, tendrás ~30 barras claras.
+        df_semanal = df.resample('W', on='fecha')['venta_total'].sum().reset_index()
+
+        if len(df_semanal) > 1:
+            # 3. Calcular la Regresión Lineal (Tendencia)
+            df_semanal['fecha_num'] = df_semanal['fecha'].map(pd.Timestamp.timestamp)
             
             model = LinearRegression()
-            # Reshape es necesario para que sklearn entienda que es una sola variable
-            X = df_resample['fecha_num'].values.reshape(-1, 1)
-            y = df_resample['venta_total'].values
+            X = df_semanal['fecha_num'].values.reshape(-1, 1)
+            y = df_semanal['venta_total'].values
             
             model.fit(X, y)
-            df_resample['tendencia'] = model.predict(X)
-            
-            fig_line = px.scatter(
-                df_resample, 
+            df_semanal['tendencia'] = model.predict(X)
+
+            # 4. GRAFICAR (Barras + Línea)
+            # Usamos BARRAS para los datos reales (se ve más "sólido" que los puntos)
+            fig_trend = px.bar(
+                df_semanal, 
                 x='fecha', 
-                y='venta_total', 
-                opacity=0.6, 
-                title='Ventas Diarias vs Tendencia',
-                labels={'venta_total': 'Venta Total ($)', 'fecha': 'Fecha'}
+                y='venta_total',
+                title='Evolución de Ventas Semanales + Tendencia',
+                labels={'venta_total': 'Ventas ($)', 'fecha': 'Semana'},
+                opacity=0.6  # Un poco transparente para que la línea destaque
             )
             
-            fig_line.add_scatter(
-                x=df_resample['fecha'], 
-                y=df_resample['tendencia'], 
+            # Agregamos la línea de tendencia encima
+            fig_trend.add_scatter(
+                x=df_semanal['fecha'], 
+                y=df_semanal['tendencia'], 
                 mode='lines', 
                 name='Tendencia', 
-                line=dict(color='red', width=3) 
+                line=dict(color='red', width=4) # Línea roja y gruesa
             )
             
-            st.plotly_chart(fig_line, use_container_width=True)
+            # Ajustes visuales para que se vea profesional
+            fig_trend.update_layout(
+                xaxis_title="Semana",
+                yaxis_title="Total Vendido ($)",
+                showlegend=True
+            )
+
+            st.plotly_chart(fig_trend, use_container_width=True)
             
+            # DATO CLAVE: Mostrar la tasa de crecimiento
+            coef = model.coef_[0] * 604800 # Pendiente por segundos en una semana
+            estado = "creciendo 📈" if coef > 0 else "decreciendo 📉"
+            st.info(f"Análisis rápido: Tus ventas están {estado} a un ritmo promedio de ${abs(coef):.2f} por semana.")
+
         else:
-            st.warning("No hay suficientes datos diarios para calcular una tendencia.")
+            st.warning("No hay suficientes semanas de datos para calcular una tendencia.")
 
         # Gráfico interactivo de ventas por turno
         st.subheader('Ventas total por turno (Interactividad)')
