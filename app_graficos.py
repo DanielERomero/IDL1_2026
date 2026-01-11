@@ -98,7 +98,7 @@ if data:
         st.markdown('</div>', unsafe_allow_html=True)
         
         # Gráfico interactivo de ventas por producto
-        st.subheader('Ventas total por producto (Interactividad)')
+        st.subheader('Ventas total por producto')
         ventas_producto = df.groupby('producto')['venta_total'].sum().reset_index()
         fig1 = px.bar(ventas_producto, x='producto', y='venta_total', title='Ventas por Producto', color='producto', color_continuous_scale='Viridis')
         st.plotly_chart(fig1)
@@ -145,7 +145,7 @@ if data:
             st.warning("No hay suficientes datos diarios para calcular una tendencia.")
 
         # Gráfico interactivo de ventas por turno
-        st.subheader('Ventas total por turno (Interactividad)')
+        st.subheader('Ventas total por turno ')
         # Agrupar las ventas por turno
         ventas_turno = df.groupby('turno')['venta_total'].sum().reset_index()
 
@@ -156,7 +156,7 @@ if data:
         st.plotly_chart(fig2)
 
         # Gráfico interactivo de ventas por tienda
-        st.subheader('Ventas total por tienda (Interactividad)')
+        st.subheader('Ventas total por tienda ')
         ventas_tienda = df.groupby('tienda')['venta_total'].sum().reset_index()
         fig3 = px.bar(ventas_tienda, x='tienda', y='venta_total', title='Ventas por Tienda', color='tienda', color_continuous_scale='RdBu')
         st.plotly_chart(fig3)
