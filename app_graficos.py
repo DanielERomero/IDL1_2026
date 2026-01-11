@@ -38,7 +38,7 @@ def obtener_datos():
         return []
     try:
         # Ajusta el nombre de la tabla si es necesario
-        response = supabase.table('IDL1_2026').select('*').limit(10000).execute().data
+        response = supabase.table('IDL1_2026').select('*').limit(10000).execute()
         return response.data
     except Exception as e:
         st.error(f"Error al obtener los datos: {e}")
