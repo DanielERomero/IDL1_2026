@@ -95,8 +95,13 @@ if archivo is not None:
 
         # Gráfico interactivo de ventas por turno
         st.subheader('Ventas total por turno (Interactividad)')
+        # Agrupar las ventas por turno
         ventas_turno = df.groupby('turno')['venta_total'].sum().reset_index()
-        fig2 = px.pie(ventas_turno, title='Ventas por Turno', color='turno', color_continuous_scale='Blues')
+
+        # Ahora, crea el gráfico de torta con las columnas correctas
+        fig2 = px.pie(ventas_turno, names='turno', values='venta_total', title='Ventas por Turno', color='turno', color_continuous_scale='Blues')
+
+        # Mostrar el gráfico
         st.plotly_chart(fig2)
 
         # Gráfico interactivo de ventas por tienda
