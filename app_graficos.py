@@ -15,7 +15,7 @@ st.set_page_config(page_title="Visor de Ventas", layout="wide")
 st.title('Visor de ventas - Tienda de conveniencia')
 
 # Definir columnas necesarias globalmente para evitar errores
-columnas_necesarias = {'producto', 'turno', 'tienda', 'venta_total'}
+columnas_necesarias = {'producto', 'turno', 'tienda', 'venta_total','fecha'}
 
 # Conexión a Supabase 
 @st.cache_resource
