@@ -104,42 +104,57 @@ if data:
         st.plotly_chart(fig1)
 
         # Gráfico de lineas
-        st.subheader('Tendencia de Ventas en el Tiempo')
-        df['fecha'] = pd.to_datetime(df['fecha'])
-    
-        # Agrupar las ventas por fecha 
-        df_resample = df.resample('M', on='fecha').sum().reset_index()  
+        # --- GRÁFICO DE TENDENCIA MENSUAL ---
+        st.subheader('Tendencia de Ventas Mensual')
         
-        if len(df_resample) > 1:
-            # Convertimos fecha a número (timestamp) para que sklearn la entienda
-            df_resample['fecha_num'] = df_resample['fecha'].map(pd.Timestamp.timestamp)
+        # 1. Asegurar formato fecha
+        df['fecha'] = pd.to_datetime(df['fecha'])
+
+        # 2. Agrupar por MES ('ME' = Month End)
+        # Usamos 'ME' (fin de mes) para obtener un punto por cada mes
+        df_mensual = df.resample('ME', on='fecha')['venta_total'].sum().reset_index()
+
+        # 3. Calcular Regresión Lineal (Solo si hay más de 1 mes)
+        if len(df_mensual) > 1:
+            # Convertimos a timestamp para el modelo matemático
+            df_mensual['fecha_num'] = df_mensual['fecha'].map(pd.Timestamp.timestamp)
             
             model = LinearRegression()
-            # Reshape es necesario para que sklearn entienda que es una sola variable
-            X = df_resample['fecha_num'].values.reshape(-1, 1)
-            y = df_resample['venta_total'].values
+            X = df_mensual['fecha_num'].values.reshape(-1, 1)
+            y = df_mensual['venta_total'].values
             
             model.fit(X, y)
-            df_resample['tendencia'] = model.predict(X)
+            df_mensual['tendencia'] = model.predict(X)
             
-            fig_line = px.scatter(
-                df_resample, 
+            # 4. GRAFICAR
+            fig_line = px.line(
+                df_mensual, 
                 x='fecha', 
-                y='venta_total', 
-                opacity=0.6, 
-                title='Ventas Diarias vs Tendencia',
-                labels={'venta_total': 'Venta Total ($)', 'fecha': 'Fecha'}
+                y='venta_total',
+                title='Evolución Mensual',
+                markers=True # Pone puntitos en cada mes
             )
             
+            # Añadir línea de tendencia
             fig_line.add_scatter(
-                x=df_resample['fecha'], 
-                y=df_resample['tendencia'], 
+                x=df_mensual['fecha'], 
+                y=df_mensual['tendencia'], 
                 mode='lines', 
                 name='Tendencia', 
-                line=dict(color='red', width=3) 
+                line=dict(color='red', dash='dash')
+            )
+            
+            
+            fig_line.update_xaxes(
+                dtick="M1",           # Fuerza una marca por cada 1 Mes
+                tickformat="%b\n%Y"   # Formato: "Jan 2024" (Abreviado + Año)
             )
             
             st.plotly_chart(fig_line, use_container_width=True)
+            
+        else:
+            st.warning("Solo veo 1 mes de datos. Posible causa: Límite de Supabase.")
+            st.info("Ve a la función `obtener_datos()` y cambia `.select('*')` por `.select('*').limit(10000)`")
 
             st.subheader('Distribución de Ventas Mensuales (Box Plot)')
 
