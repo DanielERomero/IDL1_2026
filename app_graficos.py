@@ -6,20 +6,34 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.linear_model import LinearRegression
-
+from supabase import create_client
 
 st.title('Visor de ventas - Tienda de conveniencia')
 
 # Definir columnas necesarias globalmente para evitar errores
 columnas_necesarias = {'producto', 'turno', 'tienda', 'venta_total'}
 
-archivo = st.file_uploader('Sube el archivo CSV', type=['csv'])
+# Conexión a Supabase 
+url = os.getenv("https://csbwgtiaeefriziuhacr.supabase.co")  
+key = os.getenv("BDJNIyNtY4o0i25U")
+supabase = create_client(url, key)
 
-if archivo is not None:
-    # Cargar el dataframe una sola vez
-    df = pd.read_csv(archivo)
-    st.subheader('Vista previa del archivo')
+
+# obtener los datos desde Supabase
+def obtener_datos():
+    response = supabase.table('ventas').select('*').execute()
+    if response.status_code == 200:
+        return response.data
+    else:
+        st.error("Error al obtener los datos desde Supabase")
+        return []
+
+# Obtener los datos desde Supabase
+df = obtener_datos()
+if df:
+    st.subheader('Vista de Datos desde Supabase')
     st.dataframe(df)
+
     
     # Validación
     if not columnas_necesarias.issubset(df.columns):
