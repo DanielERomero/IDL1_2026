@@ -6,7 +6,10 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.linear_model import LinearRegression
-from supabase import create_client
+from supabase import create_client, Client
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
 st.title('Visor de ventas - Tienda de conveniencia')
 
@@ -14,9 +17,9 @@ st.title('Visor de ventas - Tienda de conveniencia')
 columnas_necesarias = {'producto', 'turno', 'tienda', 'venta_total'}
 
 # Conexión a Supabase 
-url = os.getenv("https://csbwgtiaeefriziuhacr.supabase.co")  
-key = os.getenv("BDJNIyNtY4o0i25U")
-supabase = create_client(url, key)
+url = os.getenv("SUPABASE_URL")
+key = os.getenv("SUPABASE_KEY")
+supabase: Client = create_client(url, key)
 
 
 # obtener los datos desde Supabase
