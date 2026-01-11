@@ -99,7 +99,7 @@ if archivo is not None:
         ventas_turno = df.groupby('turno')['venta_total'].sum().reset_index()
 
         # Ahora, crea el gráfico de torta con las columnas correctas
-        fig2 = px.pie(ventas_turno, names='turno', values='venta_total', title='Ventas por Turno', color='turno', color_continuous_scale='Blues')
+        fig2 = px.pie(ventas_turno, names='turno', values='venta_total', title='Ventas por Turno', color='turno', color_discrete_sequence=px.colors.qualitative.Set3)
 
         # Mostrar el gráfico
         st.plotly_chart(fig2)
