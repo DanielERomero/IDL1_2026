@@ -20,7 +20,6 @@ columnas_necesarias = {'producto', 'turno', 'tienda', 'venta_total'}
 # Conexión a Supabase 
 @st.cache_resource
 def init_connection():
-    """Inicializa la conexión a Supabase usando st.secrets"""
     try:
         url = st.secrets["SUPABASE_URL"]
         key = st.secrets["SUPABASE_KEY"]
