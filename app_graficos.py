@@ -32,7 +32,7 @@ supabase = init_connection()
 
 
 # obtener los datos desde Supabase
-@st.cache_data(ttl=600) # Cache por 10 minutos
+@st.cache_data(ttl=600) 
 def obtener_datos():
     if not supabase:
         return []
@@ -50,6 +50,11 @@ if data:
     df = pd.DataFrame(data)
     st.subheader('Vista de Datos desde Supabase')
     st.dataframe(df)
+    # --- CÓDIGO TEMPORAL DE DIAGNÓSTICO ---
+    st.warning(f"📊 Filas cargadas: {len(df)}")
+    st.write(f"📅 Desde: {df['fecha'].min()}")
+    st.write(f"📅 Hasta: {df['fecha'].max()}")
+    # --------------------------------------
 
     
     # Validación
