@@ -144,9 +144,25 @@ if data:
         st.plotly_chart(fig3)
 
         # Gráfico de dispersión de ventas por producto vs turno
-        st.subheader('Dispersión de ventas por Producto vs Turno')
-        fig4 = px.scatter(df, x='producto', y='turno', size='venta_total', color='venta_total', title='Dispersión de ventas', color_continuous_scale='Rainbow')
-        st.plotly_chart(fig4)
+        st.subheader('Comparativa: Ventas por Producto y Turno')
+
+        # 1. Agrupamos los datos (Data Science Tip: Siempre agrega antes de graficar)
+        df_agrupado = df.groupby(['producto', 'turno'])['venta_total'].sum().reset_index()
+
+        # 2. Creamos el gráfico de barras agrupadas
+        fig4 = px.bar(
+            df_agrupado, 
+            x='producto', 
+            y='venta_total', 
+            color='turno', 
+            barmode='group',  # 'group' pone las barras al lado, 'stack' las apila
+            title='Ventas Totales por Producto desglosado por Turno',
+            text_auto='.2s',  # Muestra el valor resumido encima de la barra (ej: 1.2k)
+            color_discrete_sequence=px.colors.qualitative.Pastel # Colores más suaves
+        )
+
+        fig4.update_layout(xaxis_title="Producto", yaxis_title="Venta Total ($)")
+        st.plotly_chart(fig4, use_container_width=True)
 
         # --- SECCIÓN CORRELACIÓN ---
         st.title("Correlación de Pearson - ventas")
