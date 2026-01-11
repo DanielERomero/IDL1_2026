@@ -110,21 +110,39 @@ if data:
         # Agrupar las ventas por fecha 
         df_resample = df.resample('D', on='fecha').sum().reset_index()  
         
-        # Convertir las fechas a valores numéricos para la regresión
-        df_resample['fecha_num'] = df_resample['fecha'].map(pd.Timestamp.timestamp)
-        
-        # Ajustar el modelo de regresión lineal
-        model = LinearRegression()
-        model.fit(df_resample['fecha_num'].values.reshape(-1, 1), df_resample['venta_total'].values)
-        
-        # Predecir la tendencia
-        df_resample['tendencia'] = model.predict(df_resample['fecha_num'].values.reshape(-1, 1))
-        
-        # Crear el gráfico de línea con la tendencia
-        fig_line = px.line(df_resample, x='fecha', y='venta_total', title='Ventas con Línea de Tendencia')
-        fig_line.add_scatter(x=df_resample['fecha'], y=df_resample['tendencia'], mode='lines', name='Tendencia', line=dict(color='red', dash='dash'))
-        
-        st.plotly_chart(fig_line)
+        if len(df_resample) > 1:
+            # Convertimos fecha a número (timestamp) para que sklearn la entienda
+            df_resample['fecha_num'] = df_resample['fecha'].map(pd.Timestamp.timestamp)
+            
+            model = LinearRegression()
+            # Reshape es necesario para que sklearn entienda que es una sola variable
+            X = df_resample['fecha_num'].values.reshape(-1, 1)
+            y = df_resample['venta_total'].values
+            
+            model.fit(X, y)
+            df_resample['tendencia'] = model.predict(X)
+            
+            fig_line = px.scatter(
+                df_resample, 
+                x='fecha', 
+                y='venta_total', 
+                opacity=0.6, 
+                title='Ventas Diarias vs Tendencia',
+                labels={'venta_total': 'Venta Total ($)', 'fecha': 'Fecha'}
+            )
+            
+            fig_line.add_scatter(
+                x=df_resample['fecha'], 
+                y=df_resample['tendencia'], 
+                mode='lines', 
+                name='Tendencia', 
+                line=dict(color='red', width=3) 
+            )
+            
+            st.plotly_chart(fig_line, use_container_width=True)
+            
+        else:
+            st.warning("No hay suficientes datos diarios para calcular una tendencia.")
 
         # Gráfico interactivo de ventas por turno
         st.subheader('Ventas total por turno (Interactividad)')
