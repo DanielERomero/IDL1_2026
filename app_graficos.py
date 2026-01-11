@@ -7,33 +7,48 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from supabase import create_client, Client
-from dotenv import load_dotenv
 import os
-load_dotenv()
 
+
+# Configuración de página
+st.set_page_config(page_title="Visor de Ventas", layout="wide")
 st.title('Visor de ventas - Tienda de conveniencia')
 
 # Definir columnas necesarias globalmente para evitar errores
 columnas_necesarias = {'producto', 'turno', 'tienda', 'venta_total'}
 
 # Conexión a Supabase 
-url = os.getenv("SUPABASE_URL")
-key = os.getenv("SUPABASE_KEY")
-supabase: Client = create_client(url, key)
+@st.cache_resource
+def init_connection():
+    """Inicializa la conexión a Supabase usando st.secrets"""
+    try:
+        url = st.secrets["SUPABASE_URL"]
+        key = st.secrets["SUPABASE_KEY"]
+        return create_client(url, key)
+    except Exception as e:
+        st.error(f"Error de configuración de secretos: {e}")
+        return None
+
+supabase = init_connection()
 
 
 # obtener los datos desde Supabase
+@st.cache_data(ttl=600) # Cache por 10 minutos
 def obtener_datos():
-    response = supabase.table('IDL1_2026').select('*').execute()
-    if 'data' in response:
+    if not supabase:
+        return []
+    try:
+        # Ajusta el nombre de la tabla si es necesario
+        response = supabase.table('IDL1_2026').select('*').execute()
         return response.data
-    else:
-        st.error(f"Error al obtener los datos: {response.get('error_message', 'Desconocido')}")
+    except Exception as e:
+        st.error(f"Error al obtener los datos: {e}")
         return []
 
 # Obtener los datos desde Supabase
-df = obtener_datos()
-if df:
+data = obtener_datos()
+if data:
+    df = pd.DataFrame(data)
     st.subheader('Vista de Datos desde Supabase')
     st.dataframe(df)
 
@@ -41,7 +56,9 @@ if df:
     # Validación
     if not columnas_necesarias.issubset(df.columns):
         st.error('El archivo debe contener las columnas: ' + str(columnas_necesarias))
+        st.write(f"Columnas encontradas: {df.columns.tolist()}")
     else:
+        df['venta_total'] = pd.to_numeric(df['venta_total'], errors='coerce')
         # KPIs generales
         total_ventas = df['venta_total'].sum()
         ventas_promedio = df['venta_total'].mean()
